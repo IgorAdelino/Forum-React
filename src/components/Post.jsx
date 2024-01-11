@@ -1,29 +1,45 @@
+/* eslint-disable react/jsx-key */
+/* eslint-disable react/prop-types */
+import { format, formatDistanceToNow } from 'date-fns'
+import ptBr from 'date-fns/locale/pt-BR'
 import { Avatar } from './Avatar'
 import { Comment } from './Comment'
 import styles from './Post.module.css'
 
-export function Post(){
+export function Post({author, publishedAt, content}){
+  const publishedDateFormated = format(publishedAt, "d 'de' LLLL 'às' HH:mm'h'", {
+    locale: ptBr
+  })
+
+  const publishedDateRelativeToNow = formatDistanceToNow(publishedAt, {
+    locale: ptBr,
+    addSuffix: true
+  })
+
  return (
   <article className={styles.post}>
    <header>
     <div className={styles.author}>
-      <Avatar src="https://github.com/IgorAdelino.png"/>
+      <Avatar src={author.avatarUrl}/>
      <div className={styles.authorInfo}>
-      <strong>Igor Adelino</strong>
-      <span>Web developer</span>
+      <strong>{author.name}</strong>
+      <span>{author.role}</span>
      </div>
     </div>
 
-    <time title='11 de maio às 12:13' dateTime='2024-08-01'>Publicado há 1 hora</time>
+    <time title={publishedDateFormated} dateTime={publishedAt.toISOString()}>{publishedDateRelativeToNow}</time>
    </header>
 
    <div className={styles.content}>
-    <p>Hi there, Im Igor Adelino</p>
-    <p>Im a Software Engineer and Computer Science Student at University Center Unipê.</p>
-    <p>I have a deep interest in Solid Principles, Clean Architeture, Design Patterns and Microsservices</p>
-    <p>My primary interests are Backend Programming, utilizing Javascript, Typescript (Nodejs, Nestjs, Prisma, Vitest and Jest), </p>
-    <p>but also have experience in Cloud-based projects with AWS (Lambda, Aurora, API Gateway) and Frontend development (Angular, React and Next).</p>
-    <p><a href="https://github.com/IgorAdelino">My Github</a></p>
+    {
+      content.map(item=> {
+        if (item.type === 'paragraph'){
+          return <p>{item.content}</p>
+        }else if(item.type === 'link') {
+          return <p><a href='#'>{item.content}</a> </p>
+        }
+      })
+    }
    </div>
 
    <form className={styles.commentForm}>
